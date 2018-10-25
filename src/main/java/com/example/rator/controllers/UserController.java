@@ -29,11 +29,9 @@ public class UserController {
     //Creates user
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        //retrieve from courses repository and add courses based on course code from request body
-
         //save user
         userRepository.save(user);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity<User>(user, HttpStatus.CREATED);
     }
 
     //Retrieves all users
@@ -65,14 +63,25 @@ public class UserController {
         for(Evaluation e : evaluations) {
             if(e.getCourseCode().equals(courseCode) && e.getProfessorId().equals(professorId)) {
                 Evaluation eval = evaluationRepository.findAllById(e.getId());
-                int total = 2;
-                eval.setCommunication(((eval.getCommunication() + evaluation.getCommunication())/total));
-                eval.setDifficulty(((eval.getDifficulty() + evaluation.getDifficulty())/total));
-                eval.setHelpful(((eval.getHelpful() + evaluation.getHelpful())/total));
-                eval.setInterest(((eval.getInterest() + evaluation.getInterest())/total));
-                eval.setOrganization(((eval.getOrganization() + evaluation.getOrganization())/total));
-                eval.setOverall(((eval.getOverall() + evaluation.getOverall())/total));
-                eval.setNumOfEvaluation(eval.getNumOfEvaluation()+1);
+                if(eval.getNumOfEvaluation() == 0) {
+                    eval.setNumOfEvaluation(1);
+                    eval.setOverall(evaluation.getOverall());
+                    eval.setCommunication(evaluation.getCommunication());
+                    eval.setDifficulty(evaluation.getDifficulty());
+                    eval.setHelpful(evaluation.getHelpful());
+                    eval.setInterest(evaluation.getInterest());
+                    eval.setOrganization(evaluation.getOrganization());
+                }
+                else {
+                    int total = 2;
+                    eval.setCommunication(((eval.getCommunication() + evaluation.getCommunication())/total));
+                    eval.setDifficulty(((eval.getDifficulty() + evaluation.getDifficulty())/total));
+                    eval.setHelpful(((eval.getHelpful() + evaluation.getHelpful())/total));
+                    eval.setInterest(((eval.getInterest() + evaluation.getInterest())/total));
+                    eval.setOrganization(((eval.getOrganization() + evaluation.getOrganization())/total));
+                    eval.setOverall(((eval.getOverall() + evaluation.getOverall())/total));
+                    eval.setNumOfEvaluation(eval.getNumOfEvaluation()+1);
+                }
                 evaluationRepository.save(eval);
                 return new ResponseEntity<Evaluation>(eval, HttpStatus.OK);
             }
