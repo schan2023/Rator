@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface EvaluationRepository extends MongoRepository<Evaluation, String> {
 
+    @Override
     public List<Evaluation> findAll();
 
     public Evaluation findAllById(String id);

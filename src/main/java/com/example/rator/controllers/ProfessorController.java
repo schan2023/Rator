@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class ProfessorController {
@@ -92,5 +93,21 @@ public class ProfessorController {
             }
         }
         return new ResponseEntity<Evaluation>(HttpStatus.BAD_REQUEST);
+    }
+
+    //Retrieve one evaluations
+    @RequestMapping(value = "/evaluations/{evalId}", method = RequestMethod.PUT)
+    public ResponseEntity<Evaluation> updateOneEvaluation(@RequestBody Evaluation evaluation,
+                                                          @PathVariable("evalId") String evalId) {
+        Evaluation eval = evaluationRepository.findAllById(evalId);
+        eval.setNumOfEvaluation(evaluation.getNumOfEvaluation());
+        eval.setOverall(evaluation.getOverall());
+        eval.setHelpful(evaluation.getHelpful());
+        eval.setOrganization(evaluation.getOrganization());
+        eval.setCommunication(evaluation.getCommunication());
+        eval.setInterest(evaluation.getInterest());
+        eval.setDifficulty(evaluation.getDifficulty());
+        evaluationRepository.save(eval);
+        return new ResponseEntity<Evaluation>(eval, HttpStatus.OK);
     }
 }
