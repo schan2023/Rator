@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.persistence.Entity;
 import java.util.List;
 
-@Document(collection = "users")
 @Entity
 public class User {
     @Id
