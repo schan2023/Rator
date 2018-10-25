@@ -3,6 +3,7 @@ package com.example.rator.controllers;
 import com.example.rator.models.Evaluation;
 import com.example.rator.models.ProfCourse;
 import com.example.rator.models.Professor;
+import com.example.rator.models.ProfessorDto;
 import com.example.rator.repositories.EvaluationRepository;
 import com.example.rator.repositories.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -58,19 +60,27 @@ public class ProfessorController {
     //Retrieve professors by course code
     //course code is case sensitive
     @RequestMapping(value = "/professors/course/{courseCode}", method = RequestMethod.GET)
-    public ResponseEntity<List<Professor>> getAllProfessorsByCourseCode(@PathVariable("courseCode")
+    public ResponseEntity<List<ProfessorDto>> getAllProfessorsByCourseCode(@PathVariable("courseCode")
                                                                                     String courseCode) {
-        //Return prof object with just the course associated with course code ??
-
+        List<ProfessorDto> professorDtoList = new ArrayList<>();
         List<Professor> professorsByCourseCode = professorRepository.findByCoursesTaughtCourseCodeIgnoreCase(courseCode);
-        return new ResponseEntity<List<Professor>>(professorsByCourseCode, HttpStatus.OK);
+        for(Professor p: professorsByCourseCode) {
+            for(ProfCourse pfc: p.getCoursesTaught()) {
+                if(pfc.getCourseCode().equals(courseCode)) {
+                    professorDtoList.add(new ProfessorDto(p.getId(), p.getName(), pfc.getTerm()));
+                }
+            }
+        }
+        return new ResponseEntity<List<ProfessorDto>>(professorDtoList, HttpStatus.OK);
     }
 
+    //Retrieve all evaluations
     @RequestMapping(value = "/evaluations", method = RequestMethod.GET)
     public ResponseEntity<List<Evaluation>> getAllEvaluations() {
         List<Evaluation> evaluations = evaluationRepository.findAll();
         return new ResponseEntity<List<Evaluation>>(evaluations, HttpStatus.OK);
     }
+
     //Retrieve evaluation based on profId and courseCode
     @RequestMapping(value = "/evaluation/{profId}/{courseCode}", method = RequestMethod.GET)
     public ResponseEntity<Evaluation> getEvaluation(@PathVariable("profId") String profId,

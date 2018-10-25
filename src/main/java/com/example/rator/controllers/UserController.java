@@ -43,6 +43,8 @@ public class UserController {
         return new ResponseEntity<List<User>>(users, HttpStatus.OK);
     }
 
+    //PROBLEM: need to keep track of totals for averages
+    //Score object or array of averages and array of totals??
     //Updates evaluation based on user's courses' code and course's profId
     @RequestMapping(value = "{userId}/course/{courseCode}/evaluate", method = RequestMethod.PUT)
     public ResponseEntity<Evaluation> updateEvaluation(@PathVariable("userId") String userId,
@@ -63,13 +65,14 @@ public class UserController {
         for(Evaluation e : evaluations) {
             if(e.getCourseCode().equals(courseCode) && e.getProfessorId().equals(professorId)) {
                 Evaluation eval = evaluationRepository.findAllById(e.getId());
-                eval.setNumOfEvaluation(evaluation.getNumOfEvaluation());
-                eval.setCommunication(evaluation.getCommunication());
-                eval.setDifficulty(evaluation.getDifficulty());
-                eval.setHelpful(evaluation.getHelpful());
-                eval.setInterest(evaluation.getInterest());
-                eval.setOrganization(evaluation.getOrganization());
-                eval.setOverall(evaluation.getOverall());
+                int total = 2;
+                eval.setCommunication(((eval.getCommunication() + evaluation.getCommunication())/total));
+                eval.setDifficulty(((eval.getDifficulty() + evaluation.getDifficulty())/total));
+                eval.setHelpful(((eval.getHelpful() + evaluation.getHelpful())/total));
+                eval.setInterest(((eval.getInterest() + evaluation.getInterest())/total));
+                eval.setOrganization(((eval.getOrganization() + evaluation.getOrganization())/total));
+                eval.setOverall(((eval.getOverall() + evaluation.getOverall())/total));
+                eval.setNumOfEvaluation(eval.getNumOfEvaluation()+1);
                 evaluationRepository.save(eval);
                 return new ResponseEntity<Evaluation>(eval, HttpStatus.OK);
             }
